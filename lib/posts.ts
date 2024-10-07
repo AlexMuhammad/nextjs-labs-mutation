@@ -47,7 +47,7 @@ function initDb() {
 
 initDb();
 
-export async function getPosts(maxNumber) {
+export async function getPosts(maxNumber?: number) {
   let limitClause = "";
 
   if (maxNumber) {
@@ -67,7 +67,7 @@ export async function getPosts(maxNumber) {
   return maxNumber ? stmt.all(maxNumber) : stmt.all();
 }
 
-export async function storePost(post) {
+export async function storePost(post: any) {
   const stmt = db.prepare(`
     INSERT INTO posts (image_url, title, content, user_id)
     VALUES (?, ?, ?, ?)`);
