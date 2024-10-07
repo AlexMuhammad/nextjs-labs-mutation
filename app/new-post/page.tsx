@@ -1,14 +1,36 @@
 import FormSubmit from "@/components/form-submit";
+import PostForm from "@/components/post-form";
 import { storePost } from "@/lib/posts";
 import { redirect } from "next/navigation";
 import React from "react";
 
 const NewPostPage = () => {
-  async function createPost(formData: FormData) {
+  async function createPost(prevState:any, formData: FormData){
     "use server";
-    const title = formData.get("title");
-    const image = formData.get("image");
-    const content = formData.get("content");
+    const title = formData.get("title") as string;
+    const image = formData.get("image") as File;
+    const content = formData.get("content") as string;
+
+    let errors: string[] = [];
+
+    console.log("image", image);
+    if (!title || title.trim().length === 0) {
+      errors.push("Title is required");
+    }
+
+    if (!content || content.trim().length === 0) {
+      errors.push("Content is required");
+    }
+
+    if (!image || image.size === 0) {
+      errors.push("Image is required");
+    }
+
+    if (errors.length > 0) {
+      return {
+        errors,
+      };
+    }
 
     await storePost({
       imageUrl: "",
@@ -19,39 +41,7 @@ const NewPostPage = () => {
 
     redirect("/feed");
   }
-  return (
-    <div className="max-w-xl mx-auto">
-      <h1>Create Post Data</h1>
-      <form action={createPost}>
-        <div className="flex flex-col gap-3">
-          <label htmlFor="title">Title</label>
-          <input type="text" id="title" name="title" className="text-black" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <label htmlFor="title">Image</label>
-          <input
-            type="file"
-            id="image"
-            name="image"
-            accept="image/png, image/jpeg"
-            className="text-white"
-          />
-        </div>
-        <div className="flex flex-col gap-3">
-          <label htmlFor="title">Content</label>
-          <textarea
-            id="content"
-            name="content"
-            rows={5}
-            className="text-black"
-          />
-        </div>
-        <div>
-          <FormSubmit />
-        </div>
-      </form>
-    </div>
-  );
+  return <PostForm action={createPost} />;
 };
 
 export default NewPostPage;
